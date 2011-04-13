@@ -1,5 +1,4 @@
 package com.a24studio.cairngormchains.control {
-	import com.a24studio.a24cairngorm.model.ModelLocator;
 	import com.a24studio.cairngormchains.chains;
 	import com.adobe.cairngorm.control.CairngormEvent;
 	
