@@ -46,17 +46,21 @@ package com.a24studio.cairngormchains.control {
 		 * chain multiple events together easily.
 		 * 
 		 * @param String type The type of this event.
-		 * @param Array arrResponders The array of responders that should be notified when the corresponding commands complete. Defaults to null.
+		 * @param Object arrResponders The array of responders that should be notified when the corresponding commands complete. This can also be a single IResponder object. Defaults to null.
 		 * @param Boolean bubbles Whether the event should bubble up. Defaults to false.
 		 * @param Boolean cancelable Whether the event can be cancelled, defaults to false.
 		 */ 
-		public function ChainEvent( type : String, arrResponders : Array = null, bubbles : Boolean = false, cancelable : Boolean = false ) {
+		public function ChainEvent( type : String, arrResponders : Object = null, bubbles : Boolean = false, cancelable : Boolean = false ) {
 			super( type, bubbles, cancelable );
 			
 			if ( arrResponders == null ) {
 				arrResponders = [ ];
+			} else if ( arrResponders is IResponder ) {
+				arrResponders = [ arrResponders ];
+			} else if ( !arrResponders is Array ) {
+				throw new Error( 'Only Arrays and IResponders are supported.' );
 			}
-			this.arrResponders = arrResponders;
+			this.arrResponders = arrResponders as Array;
 		}
 		
 		/**

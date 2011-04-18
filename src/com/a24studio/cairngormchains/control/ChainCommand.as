@@ -82,19 +82,8 @@ package com.a24studio.cairngormchains.control {
 		 * @return void
 		 */
 		public function result( data : Object ) : void {
-			if ( relatedEvent.arrResponders != null && relatedEvent.arrResponders.length != 0 ) {
-				//Loop over the responders
-				for ( var i : int = 0; i < relatedEvent.arrResponders.length; i++ ) {
-					var objResponder : IResponder = relatedEvent.arrResponders[ i ];
-					try {
-						//And let each one know that we're done.
-						objResponder.result( data );
-					} catch ( e : ChainError ) {
-						//error thrown by responder result handler indicating that we want to stop execution
-						break;
-					}
-				}
-			}
+			var objChainData : ChainData = new ChainData( relatedEvent, this, data, true );
+			sendDataToResponders( objChainData, true );
 		}
 		
 		/**
@@ -107,15 +96,36 @@ package com.a24studio.cairngormchains.control {
 		 * @return void
 		 */
 		public function fault( info : Object ) : void {
+			var objChainData : ChainData = new ChainData( relatedEvent, this, info, false );
+			sendDataToResponders( objChainData, false );
+		}
+		
+		/**
+		 * Sends the provided data object to the responders configured for this command.
+		 * The success parameter indicates whether it should be sent using the result handler function
+		 * or the fault handler function.
+		 * 
+		 * @param Object objData The data to send to the responders.
+		 * @param Boolean bSuccessful Whether to send using result or fault.
+		 * 
+		 * @return void
+		 */
+		protected function sendDataToResponders( objData : Object, bSuccessful : Boolean ) : void {
 			if ( relatedEvent.arrResponders != null && relatedEvent.arrResponders.length != 0 ) {
 				//Loop over the configured responders.
 				for ( var i : int = 0; i < relatedEvent.arrResponders.length; i++ ) {
 					var objResponder : IResponder = relatedEvent.arrResponders[ i ];
-					try {
-						objResponder.fault( info );
-					} catch ( e : ChainError ) {
-						//error thrown by responder result handler indicating that we want to stop execution
-						break;
+					if ( objResponder != null ) {
+						try {
+							if ( bSuccessful ) {
+								objResponder.result( objData );
+							} else {
+								objResponder.fault( objData );
+							}
+						} catch ( e : ChainError ) {
+							//error thrown by responder result handler indicating that we want to stop execution
+							break;
+						}
 					}
 				}
 			}
