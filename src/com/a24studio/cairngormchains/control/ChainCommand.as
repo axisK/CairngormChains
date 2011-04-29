@@ -5,6 +5,7 @@ package com.a24studio.cairngormchains.control {
 	
 	import mx.rpc.IResponder;
 	import mx.rpc.Responder;
+	import mx.utils.ObjectUtil;
 	
 	/**
 	 * This class will use things in the internal chains namespace. Anything that is not declared
@@ -62,13 +63,21 @@ package com.a24studio.cairngormchains.control {
 		 */
 		chains function executeChain( ) : void {
 			//Make sure the event is actually a chain and make sure that there are still chained events left.
-			if ( relatedEvent.type == ChainEvent.CHAIN && relatedEvent.arrChainedEvents.length != 0 ) {
-				//Get the next one to run
-				var evt: ChainEvent = relatedEvent.arrChainedEvents.shift( ) as ChainEvent;
-				//Add a responder to it so we can continue afterwards.
-				evt.arrResponders.push( new Responder( this.subCommandSuccessfulHandler, this.subCommandFailedHandler) );
-				//Dispatch it
-				evt.dispatch( );
+			if ( relatedEvent.type == ChainEvent.CHAIN ) {
+				if ( relatedEvent.arrChainedEvents.length != 0 ) {
+					//Get the next one to run
+					var evt: ChainEvent = relatedEvent.arrChainedEvents.shift( ) as ChainEvent;
+					
+					//Add global responders
+					evt.arrResponders = evt.arrResponders.concat( relatedEvent.arrResponders );
+					
+					//Add a responder to it so we can continue afterwards.
+					evt.arrResponders.push( new Responder( this.subCommandSuccessfulHandler, this.subCommandFailedHandler) );
+					
+					//Dispatch it
+					evt.dispatch( );
+				}
+				
 			}
 		}
 		

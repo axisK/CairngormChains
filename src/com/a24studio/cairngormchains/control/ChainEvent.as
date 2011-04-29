@@ -52,7 +52,6 @@ package com.a24studio.cairngormchains.control {
 		 */ 
 		public function ChainEvent( type : String, arrResponders : Object = null, bubbles : Boolean = false, cancelable : Boolean = false ) {
 			super( type, bubbles, cancelable );
-			
 			if ( arrResponders == null ) {
 				arrResponders = [ ];
 			} else if ( arrResponders is IResponder ) {
@@ -73,7 +72,8 @@ package com.a24studio.cairngormchains.control {
 		 * @return ChainEvent
 		 */
 		public static function chainEvents( responder : IResponder, ...args ) : ChainEvent {
-			var evt : ChainEvent = new ChainEvent( CHAIN, [ responder ] );
+			var evt : ChainEvent = new ChainEvent( CHAIN, responder );
+			
 			for ( var i : int = 0 ; i < args.length; i++ ) {
 				if ( args[i] is ChainEvent ) {
 					evt.arrChainedEvents.push( args[i] );
